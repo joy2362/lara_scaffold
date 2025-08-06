@@ -1,0 +1,31 @@
+#!/bin/sh
+
+echo "🔹 Running Pre-Commit Checks..."
+
+# 1️⃣ Run Laravel Pint (Code Style)
+if [ -f "./vendor/bin/pint" ]; then
+
+    # 1️⃣ Run Laravel Pint (Code Style)
+    echo "➡️  Running Laravel Pint..."
+    ./vendor/bin/pint
+
+    STATUS=$?
+
+    # ❌ If Pint fails, abort the commit
+    if [ $STATUS -ne 0 ]; then
+        echo "❌ Pint failed. Fix errors before committing."
+        exit 1
+    fi
+
+    # 2️⃣ If Pint fixed files, add them to the commit
+    CHANGED_FILES=$(git status --porcelain | grep -E '^[AM]' | awk '{print $2}')
+
+    if [ -n "$CHANGED_FILES" ]; then
+        echo "🔹 Adding Pint-fixed files to commit..."
+        git add $CHANGED_FILES
+    fi
+else
+    echo "⚠️  Pint not found. Skipping code style checks."
+fi
+
+echo "✅ Pre-commit checks completed!"

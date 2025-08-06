@@ -1,0 +1,29 @@
+name: format
+
+on: 
+  push:
+    branches: '*'
+
+jobs:
+  format:
+    if: ${{ github.ref_name != 'main' && github.ref_name != 'dev' }}
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: write
+    env: 
+      NODE_VERSION: 20
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          node_version: ${{ env.NODE_VERSION }}
+      
+      - name: "Laravel-pint"
+        uses: aglipanci/laravel-pint-action@latest
+        with: 
+          preset: psr12
+      
+      - name: "Commit changes"
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "style: fix coding style"
